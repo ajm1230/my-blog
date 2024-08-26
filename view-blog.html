@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Blog</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .post { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
+        h1 { color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Blog Posts</h1>
+        <div id="content"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('https://raw.githubusercontent.com/username/my-blog/main/blog.xml')
+                .then(response => response.text())
+                .then(xmlData => {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlData, 'text/xml');
+                    const posts = xmlDoc.querySelectorAll('post');
+                    const container = document.getElementById('content');
+                    posts.forEach(post => {
+                        const title = post.querySelector('title').textContent;
+                        const content = post.querySelector('content').textContent;
+                        container.innerHTML += `
+                            <div class="post">
+                                <h2>${title}</h2>
+                                <p>${content}</p>
+                            </div>
+                        `;
+                    });
+                });
+        });
+    </script>
+</body>
+</html>
