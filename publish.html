@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publish Blog Post</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+        .form-container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+        h1 { color: #333; }
+        label { display: block; margin: 10px 0 5px; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background-color: #333; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #555; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Publish New Blog Post</h1>
+        <form id="publishForm">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+            <label for="content">Content:</label>
+            <textarea id="content" name="content" rows="10" required></textarea>
+            <button type="button" onclick="publishPost()">Publish</button>
+        </form>
+    </div>
+    <script>
+        function publishPost() {
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+
+            // Create a new post element
+            const postXml = `<post><title>${title}</title><content>${content}</content></post>`;
+
+            // Fetch existing XML data from the repository (simulated here)
+            fetch('https://raw.githubusercontent.com/username/my-blog/main/blog.xml')
+                .then(response => response.text())
+                .then(xmlData => {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlData, 'text/xml');
+                    const post = xmlDoc.createElement('post');
+                    const titleElement = xmlDoc.createElement('title');
+                    titleElement.textContent = title;
+                    const contentElement = xmlDoc.createElement('content');
+                    contentElement.textContent = content;
+                    post.appendChild(titleElement);
+                    post.appendChild(contentElement);
+                    xmlDoc.querySelector('posts').appendChild(post);
+
+                    // Serialize and push XML to the repository
+                    const serializer = new XMLSerializer();
+                    const updatedXml = serializer.serializeToString(xmlDoc);
+
+                    // Simulate saving XML data (not actually saving in GitHub Pages)
+                    console.log('Updated XML:', updatedXml);
+
+                    // Redirect to a new page for the post
+                    const postHtml = `
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>${title}</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+                                .post { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 800px; margin: auto; }
+                                h1 { color: #333; }
+                            </style>
+                        </head>
+                        <body>
+                            <div class='post'>
+                                <h1>${title}</h1>
+                                <p>${content}</p>
+                            </div>
+                        </body>
+                        </html>
+                    `;
+                    const blob = new Blob([postHtml], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    window.open(url, '_blank');
+                });
+        }
+    </script>
+</body>
+</html>
