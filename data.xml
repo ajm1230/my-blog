@@ -8,6 +8,6 @@
     <book>
         <title>Advanced XML Techniques</title>
         <author>Jane Smith</author>
-        <price>39.95</price>
+        <price>₹500</price>
     </book>
 </catalog>
